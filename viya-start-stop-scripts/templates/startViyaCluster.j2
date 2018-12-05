@@ -1,0 +1,40 @@
+#!/bin/sh
+#http://go.documentation.sas.com/?docsetId=calchkadm&docsetTarget=n00003ongoingtasks00000admin.htm&docsetVersion=3.3&locale=en#n03025viyainfrsrvs00000admin
+
+usage() {
+  filename=`basename "$0"`
+  echo "usage: $filename -i sshkey -h"
+}
+
+while [ "$1" != "" ]; do
+  case $1 in
+    -i | --sshkey ) shift
+                    user_ssh_key=$1
+                    ;;
+    -h | --help )   usage
+                    exit
+                    ;;
+    * )             usage
+                    exit 1
+  esac
+  shift
+done
+
+ssh_key_option="-i $user_ssh_key"
+if [ "$user_ssh_key" = "" ]; then
+  ssh_key_option=""
+fi
+
+./startStopConsulVault.sh -a start $ssh_key_option
+echo "wait 10 sec"; sleep 10s
+./startStopRabbitMQ.sh -a start $ssh_key_option
+echo "wait 10 sec"; sleep 10s
+./startStopPostgresql.sh -a start $ssh_key_option
+echo "wait 10 sec"; sleep 10s
+./startStopHttpProxy.sh -a start $ssh_key_option
+echo "wait 10 sec"; sleep 10s
+./startStopCAS.sh -a start $ssh_key_option
+echo "wait 30 sec"; sleep 30s
+./startStopCacheServerLocator.sh -a start $ssh_key_option
+echo "wait 30 sec"; sleep 30s
+./startStopMicroWebServcices.sh -a start $ssh_key_option

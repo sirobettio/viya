@@ -1,0 +1,76 @@
+#!/bin/bash
+
+usage() {
+  filename=`basename "$0"`
+  echo "usage: $filename -a action -i sshkey -h"
+}
+
+action=status
+
+while [ "$1" != "" ]; do
+  case $1 in
+    -a | --action ) shift
+                    action=$1
+                    ;;
+    -i | --sshkey ) shift
+                    user_ssh_key=$1
+                    ;;
+    -h | --help )   usage
+                    exit
+                    ;;
+    * )             usage
+                    exit 1
+  esac
+  shift
+done
+
+ssh_key_option="-i $user_ssh_key"
+if [ "$user_ssh_key" = "" ]; then
+  ssh_key_option=""
+fi
+
+{% set allservers = joiner(" ") %}
+ALL_SERVERS="{% for host in hostvars %}{{ allservers() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
+
+{% set consulservers = joiner(" ") %}
+PRIMARY_CONSUL_SERVERS="{% for host in groups['consul'] %}{{ consulservers() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
+
+SECONDARY_CONSUL_SERVERS=$(comm -3 <(echo ${ALL_SERVERS[*]}| tr " " "\n"| sort) <(echo ${PRIMARY_CONSUL_SERVERS[*]} | tr " " "\n"| sort)| sort -g)
+
+startStopConsul() {
+  action=$1
+  serverlist=$2
+  echo "==========================================================================="
+  echo " $action CONSUL"
+  echo "==========================================================================="
+  for hst in ${serverlist}; do
+    echo -ne "> $action CONSUL on ${hst}: "
+    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-consul-default $action; sleep 3s"
+  done
+}
+
+startStopVault() {
+  action=$1
+  serverlist=$2
+  echo "==========================================================================="
+  echo " $action CONSUL"
+  echo "==========================================================================="
+  for hst in ${serverlist}; do
+    echo -ne "> $action VAULT on ${hst}: "
+    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-vault-default $action; sleep 3s"
+  done
+}
+
+if [ "$action" = "stop" ]; then
+	startStopVault $action "$PRIMARY_CONSUL_SERVERS"
+  echo "wait 10 sec"; sleep 10s
+  startStopConsul $action "$SECONDARY_CONSUL_SERVERS"
+   echo "wait 10 sec"; sleep 10s
+  startStopConsul $action "$PRIMARY_CONSUL_SERVERS"
+else
+  startStopConsul $action "$PRIMARY_CONSUL_SERVERS"
+  echo "wait 10 sec"; sleep 10s
+  startStopConsul $action "$SECONDARY_CONSUL_SERVERS"
+  echo "wait 10 sec"; sleep 10s
+  startStopVault $action "$PRIMARY_CONSUL_SERVERS"
+fi

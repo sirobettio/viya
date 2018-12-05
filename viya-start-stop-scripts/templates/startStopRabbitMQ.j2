@@ -1,0 +1,47 @@
+#!/bin/bash
+
+usage() {
+  filename=`basename "$0"`
+  echo "usage: $filename -a action -i sshkey -h"
+}
+
+action=status
+
+while [ "$1" != "" ]; do
+  case $1 in
+    -a | --action ) shift
+                    action=$1
+                    ;;
+    -i | --sshkey ) shift
+                    user_ssh_key=$1
+                    ;;
+    -h | --help )   usage
+                    exit
+                    ;;
+    * )             usage
+                    exit 1
+  esac
+  shift
+done
+
+ssh_key_option="-i $user_ssh_key"
+if [ "$user_ssh_key" = "" ]; then
+  ssh_key_option=""
+fi
+
+{% set rabbitmqservers = joiner(" ") %}
+RABBITMQ_SERVERS="{% for host in groups['rabbitmq'] %}{{ rabbitmqservers() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
+
+startStopRabbitMQ() {
+  action=$1
+  serverlist=$2
+  echo "==========================================================================="
+  echo " $action RABBITMQ"
+  echo "==========================================================================="
+  for hst in ${serverlist}; do
+    echo -ne "> $action RABBITMQ on ${hst}: "
+    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-rabbitmq-server-default $action; sleep 3s"
+  done
+}
+
+startStopRabbitMQ $action "$RABBITMQ_SERVERS"

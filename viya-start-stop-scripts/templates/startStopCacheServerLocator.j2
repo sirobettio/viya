@@ -1,0 +1,69 @@
+#!/bin/bash
+
+usage() {
+  filename=`basename "$0"`
+  echo "usage: $filename -a action -i sshkey -h"
+}
+
+action=status
+
+while [ "$1" != "" ]; do
+  case $1 in
+    -a | --action ) shift
+                    action=$1
+                    ;;
+    -i | --sshkey ) shift
+                    user_ssh_key=$1
+                    ;;
+    -h | --help )   usage
+                    exit
+                    ;;
+    * )             usage
+                    exit 1
+  esac
+  shift
+done
+
+ssh_key_option="-i $user_ssh_key"
+if [ "$user_ssh_key" = "" ]; then
+  ssh_key_option=""
+fi
+
+{% set consulservers = joiner(" ") %}
+CONSUL_SERVERS="{% for host in groups['consul'] %}{{ consulservers() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
+
+startStopCacheLocator() {
+  action=$1
+  serverlist=$2
+  echo "==========================================================================="
+  echo " $action CACHE LOCATOR"
+  echo "==========================================================================="
+  for hst in ${serverlist}; do
+    echo -ne "> $action CACHE LOCATOR on ${hst}: "
+    ssh ${ssh_key_option} ${hst} "sudo sudo /etc/init.d/sas-viya-cachelocator-default $action; sleep 3s"
+  done
+}
+
+startStopCacheServer() {
+  action=$1
+  serverlist=$2
+  echo "==========================================================================="
+  echo " $action CACHE SERVER"
+  echo "==========================================================================="
+  for hst in ${serverlist}; do
+    echo -ne "> $action CACHE SERVER on ${hst}: "
+    ssh ${ssh_key_option} ${hst} "sudo sudo /etc/init.d/sas-viya-cacheserver-default $action; sleep 3s"
+  done
+}
+
+if [ "$action" = "stop" ]; then
+	startStopCacheServer $action "$CONSUL_SERVERS"
+  echo "wait 20 sec"
+  sleep 20s
+  startStopCacheLocator $action "$CONSUL_SERVERS"
+else
+  startStopCacheLocator $action "$CONSUL_SERVERS"
+  echo "wait 20 sec"
+  sleep 20s
+  startStopCacheServer $action "$CONSUL_SERVERS"
+fi

@@ -1,0 +1,28 @@
+---
+- hosts: localhost 
+  vars:
+    SAS_CONFIG_ROOT: ""
+  tasks:
+  - name: create CONSUL-VAULT start and stop script
+    template: src=templates/startStopConsulVault.j2 dest=./startStopConsulVault.sh
+  - name: create RABBITMQ start and stop script
+    template: src=templates/startStopRabbitMQ.j2 dest=./startStopRabbitMQ.sh
+  - name: create POSTGRES start and stop script
+    template: src=templates/startStopPostgresql.j2 dest=./startStopPostgresql.sh
+  - name: create HTTP PROXY start and stop script
+    template: src=templates/startStopHttpProxy.j2 dest=./startStopHttpProxy.sh
+  - name: create CAS start and stop script
+    template: src=templates/startStopCAS.j2 dest=./startStopCAS.sh
+  - name: create CACHE LOCATOR SERVER start and stop script
+    template: src=templates/startStopCacheServerLocator.j2 dest=./startStopCacheServerLocator.sh
+  - name: create MICRO WEB SERVICES start and stop script
+    template: src=templates/startStopMicroWebServcices.j2 dest=./startStopMicroWebServcices.sh
+    
+    
+  - name: create Viya start scripts
+    template: src=templates/startViyaCluster.j2 dest=./startViyaCluster.sh
+  - name: create Viya stop scripts
+    template: src=templates/stopViyaCluster.j2 dest=./stopViyaCluster.sh
+  vars_files:
+  - vars.yml
+  
