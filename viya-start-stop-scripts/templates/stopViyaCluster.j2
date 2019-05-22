@@ -25,16 +25,16 @@ if [ "$user_ssh_key" = "" ]; then
   ssh_key_option=""
 fi
 
-./startStopMicroWebServcices.sh -a start $ssh_key_option
+./startStopMicroWebServcices.sh -a stop $ssh_key_option
 echo "wait 10 sec"; sleep 10s
-./startStopCacheServerLocator.sh -a start $ssh_key_option
+./startStopCacheServerLocator.sh -a stop $ssh_key_option
 echo "wait 30 sec"; sleep 30s
-./startStopCAS.sh -a start $ssh_key_option
+./startStopCAS.sh -a stop $ssh_key_option
 echo "wait 30 sec"; sleep 30s
-./startStopHttpProxy.sh -a start $ssh_key_option
+./startStopHttpProxy.sh -a stop $ssh_key_option
 echo "wait 10 sec"; sleep 10s
-./startStopPostgresql.sh -a start $ssh_key_option
+./startStopPostgresql.sh -a stop $ssh_key_option
 echo "wait 10 sec"; sleep 10s
-./startStopRabbitMQ.sh -a start $ssh_key_option
+./startStopRabbitMQ.sh -a stop $ssh_key_option
 echo "wait 10 sec"; sleep 10s
-./startStopConsulVault.sh -a start $ssh_key_option
+./startStopConsulVault.sh -a stop $ssh_key_option
