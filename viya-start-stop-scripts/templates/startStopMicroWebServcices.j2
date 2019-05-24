@@ -39,7 +39,7 @@ startStopMicroWebServices() {
   echo " $action MICRO and WEB SERVICES"
   echo "==========================================================================="
   for hst in ${serverlist}; do
-    ( { ssh ${ssh_key_option} ${hst} "/opt/sas/utilities/scripts/gel.startStopMicroServices.sh 1 start" ; } |  sed -e "s/^/${hst}:/" ) &
+    ( { ssh ${ssh_key_option} ${hst} "/opt/sas/utilities/scripts/gel.startStopMicroServices.sh 1 $action" ; } |  sed -e "s/^/${hst}:/" ) &
   done;
   wait
 }

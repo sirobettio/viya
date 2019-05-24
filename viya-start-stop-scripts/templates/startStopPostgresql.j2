@@ -53,8 +53,8 @@ startStopPostgresNodes() {
   echo " $action POSTGRES and PG_HBA"
   echo "===========================================================================" 
   {% for host in INVOCATION_VARIABLES %}
-  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-postgresql start"
-  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-pg_hba start"
+  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-postgresql $action"
+  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-pg_hba $action"
   {% endfor %}
 }
 
