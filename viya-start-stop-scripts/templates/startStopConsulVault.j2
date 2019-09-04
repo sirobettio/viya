@@ -45,7 +45,8 @@ startStopConsul() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action CONSUL on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-consul-default $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-consul-default; sleep 3s"
+    echo " ... Done"
   done
 }
 
@@ -53,11 +54,12 @@ startStopVault() {
   action=$1
   serverlist=$2
   echo "==========================================================================="
-  echo " $action CONSUL"
+  echo " $action VAULT"
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action VAULT on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-vault-default $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-vault-default; sleep 3s"
+    echo " ... Done"
   done
 }
 

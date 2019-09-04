@@ -40,7 +40,8 @@ startStopCacheLocator() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action CACHE LOCATOR on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo sudo /etc/init.d/sas-viya-cachelocator-default $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-cachelocator-default; sleep 3s"
+    echo " ... Done"
   done
 }
 
@@ -52,7 +53,8 @@ startStopCacheServer() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action CACHE SERVER on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo sudo /etc/init.d/sas-viya-cacheserver-default $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-cacheserver-default; sleep 3s"
+    echo " ... Done"
   done
 }
 

@@ -40,7 +40,8 @@ startStopRabbitMQ() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action RABBITMQ on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-rabbitmq-server-default $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-rabbitmq-server-default; sleep 3s"
+    echo " ... Done"
   done
 }
 

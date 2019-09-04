@@ -9,7 +9,7 @@ COMMAND_TYPE="$2"
 # SYSTEM_TYPE=sysV
 if [[ "${SYSTEM_TYPE}" == "systemd" ]]
    then
-      COMMAND="sudo /etc/init.d/SVC ${COMMAND_TYPE} &"
+      COMMAND="sudo systemctl ${COMMAND_TYPE} SVC"
    else
       COMMAND="sudo service SVC ${COMMAND_TYPE} >/dev/null 2>&1 &"
 fi

@@ -43,7 +43,8 @@ startStopPostgres() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action POSTGRES on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-sasdatasvrc-postgres $action; sleep 3s"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-sasdatasvrc-postgres; sleep 3s"
+    echo " ... Done"
   done
 }
 
@@ -53,8 +54,8 @@ startStopPostgresNodes() {
   echo " $action POSTGRES and PG_HBA"
   echo "===========================================================================" 
   {% for host in INVOCATION_VARIABLES %}
-  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-postgresql $action"
-  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "hostname; sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-pg_hba $action"
+  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "sudo systemctl $action sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-postgresql"
+  ssh ${ssh_key_option} {{ hostvars[host]['ansible_host'] }} "sudo systemctl $action sas-viya-sasdatasvrc-postgres-node{% for param in INVOCATION_VARIABLES[host]['sasdatasvrc'] %}{{ param['NODE_NUMBER'] }}{% endfor %}-ct-pg_hba"
   {% endfor %}
 }
 
@@ -66,15 +67,18 @@ startStopPGPool() {
   echo "==========================================================================="
   for hst in ${serverlist}; do
     echo -ne "> $action ct-pcp on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-pgpool0-ct-pcp $action"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-sasdatasvrc-postgres-pgpool0-ct-pcp"
+    echo " ... Done"
   done
   for hst in ${serverlist}; do
     echo -ne "> $action ct-pgpool on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-pgpool0-ct-pgpool $action"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl $action sas-viya-sasdatasvrc-postgres-pgpool0-ct-pgpool"
+    echo " ... Done"
   done
   for hst in ${serverlist}; do
     echo -ne "> $action ct-pool_hba on ${hst}: "
-    ssh ${ssh_key_option} ${hst} "sudo /etc/init.d/sas-viya-sasdatasvrc-postgres-pgpool0-ct-pool_hba $action"
+    ssh ${ssh_key_option} ${hst} "sudo systemctl sas-viya-sasdatasvrc-postgres-pgpool0-ct-pool_hba"
+    echo " ... Done"
   done
 }
 
@@ -90,4 +94,3 @@ else
   startStopPostgresNodes $action
   echo "wait 5 sec"; sleep 5s
   startStopPGPool $action "$PGPOOLC_SERVERS"
-fi
