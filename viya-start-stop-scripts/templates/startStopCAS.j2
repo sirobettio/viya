@@ -30,7 +30,7 @@ if [ "$user_ssh_key" = "" ]; then
 fi
 
 {% set sascasserverprimary = joiner(" ") %}
-CAS_SERVER_PRIMARY="{% for host in groups['sas-casserver-primary'] %}{{ sascasserverprimary() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
+CAS_SERVER_PRIMARY="{% for host in groups['sas_casserver_primary'] %}{{ sascasserverprimary() }}{{hostvars[host]['ansible_host']}}{% endfor %}"
 
 startStopCASPrimary() {
   action=$1
